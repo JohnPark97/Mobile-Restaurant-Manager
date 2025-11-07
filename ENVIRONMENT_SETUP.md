@@ -146,6 +146,40 @@ tail -f /tmp/backend.log
 - Always shown live in the terminal where Expo is running
 - Look for bundling errors, Metro bundler status, and app errors
 
+### Reloading the App
+
+**Quick Reload Methods:**
+1. **Metro Bundler (Terminal)**: Press `r` to reload, `R` to reload + clear cache
+2. **iOS Simulator**: Press `Cmd + R` to reload
+3. **Developer Menu**: Press `Cmd + D`, then tap "Reload"
+4. **Fast Refresh**: Automatically reloads on file save (default enabled)
+
+**Hard Reload (if experiencing issues):**
+```bash
+# Stop current Expo process (Ctrl+C)
+# Then restart with cleared cache
+npx expo start --clear --ios
+```
+
+### Method 4: Multi-Simulator Testing (Owner + Customer)
+```bash
+./start-both-simulators.sh
+```
+
+**Behavior:**
+- Boots both simulators if needed
+- Opens app on **two simulators simultaneously**:
+  - **Owner simulator**: iPhone 16 Pro Max (test restaurant management)
+  - **Customer simulator**: Customer IPhone 16 Pro Max (test ordering)
+- Perfect for testing real-time features (order updates, notifications)
+- Shares the same Metro bundler for both
+
+**Use Cases:**
+- Test owner approving orders while customer sees status updates
+- Verify real-time queue position changes
+- Test Socket.IO connections with multiple clients
+- Validate transaction flow from both perspectives
+
 ## 🐛 Common Issues
 
 ### "The engine 'node' is incompatible with this module"
@@ -163,6 +197,17 @@ tail -f /tmp/backend.log
 ### Mobile app not showing in simulator
 - **Cause**: Metro bundler still loading or app not installed
 - **Fix**: Wait for QR code, then press `i` to open iOS simulator
+
+### Registration/Login Fails (HTTP 429)
+- **Cause**: Rate limiter too strict for development (100 requests/15 min)
+- **Symptoms**: All API requests fail with "Too many requests"
+- **Fix**: Updated `backend/.env` rate limits:
+  ```
+  RATE_LIMIT_WINDOW_MS="60000"      # 60 seconds
+  RATE_LIMIT_MAX_REQUESTS="1000"     # 1000 requests
+  ```
+- **After changing**: Restart backend for changes to take effect
+- **Note**: Restore stricter limits before production deployment
 
 ## 📊 Current Status
 

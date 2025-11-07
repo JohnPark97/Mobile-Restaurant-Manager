@@ -91,6 +91,12 @@ This script:
 ./start-mobile.sh
 ```
 
+**Multi-simulator testing (Owner + Customer):**
+```bash
+./start-both-simulators.sh
+```
+Opens app on two simulators simultaneously for testing both perspectives and real-time features.
+
 ---
 
 ## 🔧 Manual Setup Instructions
@@ -317,6 +323,34 @@ yarn test
 cd mobile
 yarn test
 ```
+
+### Multi-Simulator Testing
+
+For comprehensive testing, you can run the app on **two simulators simultaneously**:
+
+```bash
+./start-both-simulators.sh
+```
+
+**Configured Simulators:**
+- **Owner Simulator**: iPhone 16 Pro Max
+  - Test restaurant management features
+  - Manage menu items
+  - Process orders
+  - View transactions
+  
+- **Customer Simulator**: Customer IPhone 16 Pro Max
+  - Test ordering flow
+  - Browse restaurants and menus
+  - Place orders
+  - Track order status
+
+**Perfect For:**
+- ✅ Testing real-time Socket.IO features
+- ✅ Verifying order status updates from owner → customer
+- ✅ Testing queue position changes
+- ✅ Validating transaction creation
+- ✅ End-to-end order workflow testing
 
 ## 📝 Development Notes
 
