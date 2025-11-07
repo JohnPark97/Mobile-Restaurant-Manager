@@ -1,0 +1,12 @@
+{
+  "name": "restaurant-manager-shared",
+  "version": "1.0.0",
+  "description": "Shared types for Restaurant Manager",
+  "main": "types/index.ts",
+  "types": "types/index.ts",
+  "scripts": {},
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
+

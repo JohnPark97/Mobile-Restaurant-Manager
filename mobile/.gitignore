@@ -1,0 +1,91 @@
+# Mobile .gitignore (React Native + Expo)
+
+# Dependencies
+node_modules/
+
+# Expo
+.expo/
+.expo-shared/
+web-build/
+
+# Build artifacts
+dist/
+*.ipa
+*.apk
+*.aab
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.*
+yarn-debug.log*
+yarn-error.log*
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Testing
+coverage/
+.nyc_output/
+
+# Cache
+.cache/
+node_modules/.cache/
+metro-cache/
+
+# iOS
+ios/Pods/
+ios/build/
+ios/*.xcworkspace
+!ios/*.xcworkspace/contents.xcworkspacedata
+ios/*.pbxuser
+!default.pbxuser
+ios/*.mode1v3
+!default.mode1v3
+ios/*.mode2v3
+!default.mode2v3
+ios/*.perspectivev3
+!default.perspectivev3
+ios/xcuserdata
+ios/*.xccheckout
+ios/*.moved-aside
+ios/DerivedData
+ios/*.hmap
+ios/*.ipa
+
+# Android
+android/app/build/
+android/build/
+android/.gradle/
+android/.idea/
+android/captures/
+android/local.properties
+android/app/release/
+
+# Security / Certificates
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+google-services.json
+GoogleService-Info.plist
+
+# TypeScript
+*.tsbuildinfo
+
+# Temporary files
+*.tmp
+.tmp/

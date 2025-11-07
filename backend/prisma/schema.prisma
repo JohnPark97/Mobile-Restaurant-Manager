@@ -1,0 +1,181 @@
+// Prisma schema for Restaurant Manager
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  OWNER
+  CUSTOMER
+}
+
+enum OrderType {
+  TABLE
+  ONLINE
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PREPARING
+  READY
+  COMPLETED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  CASH
+  CARD
+  DIGITAL
+}
+
+model User {
+  id            String       @id @default(uuid())
+  email         String?      @unique
+  phone         String?      @unique
+  passwordHash  String
+  role          UserRole
+  verified      Boolean      @default(false)
+  verificationCode String?
+  verificationExpiry DateTime?
+  refreshToken  String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  // Relations
+  ownedRestaurants Restaurant[]
+  orders        Order[]
+
+  @@index([email])
+  @@index([phone])
+}
+
+model Restaurant {
+  id          String    @id @default(uuid())
+  ownerId     String
+  name        String
+  address     String
+  phone       String
+  taxNumber   String?
+  approved    Boolean   @default(true) // Auto-approved for now, FUTURE: admin approval
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  owner       User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  menuItems   MenuItem[]
+  orders      Order[]
+  transactions Transaction[]
+  orderQueue  OrderQueue[]
+
+  @@index([ownerId])
+}
+
+model MenuItem {
+  id            String    @id @default(uuid())
+  restaurantId  String
+  name          String
+  description   String?
+  price         Decimal   @db.Decimal(10, 2)
+  category      String
+  imageUrl      String?
+  available     Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  restaurant    Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  orderItems    OrderItem[]
+
+  @@index([restaurantId])
+  @@index([category])
+}
+
+model Order {
+  id            String      @id @default(uuid())
+  restaurantId  String
+  customerId    String
+  type          OrderType
+  status        OrderStatus @default(PENDING)
+  tableNumber   String?
+  pickupTime    DateTime?
+  subtotal      Decimal     @db.Decimal(10, 2)
+  gst           Decimal     @db.Decimal(10, 2)
+  pst           Decimal     @db.Decimal(10, 2)
+  tip           Decimal     @db.Decimal(10, 2) @default(0)
+  total         Decimal     @db.Decimal(10, 2)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  // Relations
+  restaurant    Restaurant  @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  customer      User        @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  items         OrderItem[]
+  transaction   Transaction?
+  queueEntry    OrderQueue?
+
+  @@index([restaurantId])
+  @@index([customerId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model OrderItem {
+  id          String    @id @default(uuid())
+  orderId     String
+  menuItemId  String
+  quantity    Int
+  unitPrice   Decimal   @db.Decimal(10, 2)
+  subtotal    Decimal   @db.Decimal(10, 2)
+
+  // Relations
+  order       Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  menuItem    MenuItem  @relation(fields: [menuItemId], references: [id], onDelete: Restrict)
+
+  @@index([orderId])
+  @@index([menuItemId])
+}
+
+model OrderQueue {
+  id                  String    @id @default(uuid())
+  restaurantId        String
+  orderId             String    @unique
+  queuePosition       Int
+  estimatedReadyTime  DateTime
+  createdAt           DateTime  @default(now())
+
+  // Relations
+  restaurant          Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  order               Order      @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([restaurantId])
+  @@index([queuePosition])
+}
+
+model Transaction {
+  id                String        @id @default(uuid())
+  orderId           String        @unique
+  restaurantId      String
+  paymentMethod     PaymentMethod
+  amount            Decimal       @db.Decimal(10, 2)
+  gstAmount         Decimal       @db.Decimal(10, 2)
+  pstAmount         Decimal       @db.Decimal(10, 2)
+  tipAmount         Decimal       @db.Decimal(10, 2)
+  transactionDate   DateTime      @default(now())
+  fiscalYear        Int
+  receiptNumber     String        @unique
+
+  // Relations
+  order             Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  restaurant        Restaurant    @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  @@index([restaurantId])
+  @@index([transactionDate])
+  @@index([fiscalYear])
+}
+
